@@ -8,6 +8,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
+    "build": "bun build --target=node index.ts --outdir ./build",
     "dev": "bun run --hot index.ts",
     "start": "bun run index.ts"
   },
