@@ -32,6 +32,8 @@ RUN apt-get update && \
 
 # Copy virtual environment from build stage
 COPY --from=build-env /opt/venv /opt/venv
+COPY --from=build-env /app/tasks.py /app/tasks.py
+COPY --from=build-env /app/requirements.txt /app/requirements.txt
 
 # Set environment variables to use the venv
 ENV PATH="/opt/venv/bin:$PATH"
