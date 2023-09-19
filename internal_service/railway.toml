@@ -1,0 +1,11 @@
+[build]
+builder = "nixpacks"
+nixpacksConfigPath = "nixpacks.toml"
+buildCommand = "echo buildng!"
+
+[deploy]
+startCommand = "bun run index.ts"
+healthcheckPath = "/healthcheck"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

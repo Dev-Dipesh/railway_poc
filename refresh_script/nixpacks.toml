@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ['nodejs', 'bun']
+
+[phases.install]
+cmds = ['bun install --production']

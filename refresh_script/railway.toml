@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+nixpacksConfigPath = "nixpacks.toml"
+buildCommand = "echo buildng!"
+
+[deploy]
+startCommand = "bun run index.ts"
+restartPolicyType = "NEVER"

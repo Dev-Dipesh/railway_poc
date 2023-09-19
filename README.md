@@ -101,3 +101,68 @@ sequenceDiagram
         deactivate CeleryQueue
     end
 ```
+
+### Further Challenge
+You can update `refresh_script` to suit following workflow:
+
+> 1. Add last_polled to `feeds` table
+> 2. Celery worker picks up the task -Add- Update last_polled in Feeds table
+
+1. Independent Refresh Script (runs every 12 hours):
+    1. Call the API server to retrieve all feed URLs that need refreshing.
+        1. API server queries Redis to get the list of feed URLs currently cached.
+        2. API server queries the database to fetch all feed URLs.
+        3. API server filters out feed URLs that are already in Redis cache and returns the remaining URLs to the script.
+    2. For each feed URL that needs refreshing, the script schedules a task in the Celery queue.
+2. Celery Worker Processing:
+    1. Upon picking up a task, the Celery worker fetches the latest articles for the provided feed URL.
+    2. Save any new articles to the articles table. Handle conflicts gracefully, e.g., if an article with the same unique identifier already exists, skip/ignore or update as needed.
+    3. Update last_polled in Feeds table
+    4. Cache the feed ID and its respective articles in Redis with a key format like feed:{feed_url} and set a 3-hour expiration.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Server as Server
+    participant Redis as Redis Cache
+    participant Database as Database
+    participant CeleryQueue as Celery Queue
+    participant CeleryWorker as Celery Worker
+    participant RefreshScript as Refresh Script
+
+    activate RefreshScript
+    RefreshScript->>Server: Request feeds needing refresh (Every 12 hours)
+    activate Server
+    Server->>Database: Fetch all feed URLs that were last_polled before 12 hours
+    activate Database
+    Database-->>Server: Return feeds
+    deactivate Database
+    Server-->>RefreshScript: Return queried feeds
+    deactivate Server
+    activate CeleryQueue
+    loop for each feed URL not in cache
+        RefreshScript->>CeleryQueue: Schedule task to fetch articles
+    end
+    deactivate RefreshScript
+
+    loop for each Task in CeleryQueue
+        activate CeleryWorker
+        CeleryQueue-->>CeleryWorker: Task to fetch articles
+        CeleryWorker->>CeleryWorker: Fetch articles for feed
+        CeleryWorker->>Database: Save articles to articles table (on conflict do nothing)
+        activate Database
+        Database-->>CeleryWorker: Confirm save
+        deactivate Database
+        CeleryWorker->>Database: Update last_polled in Feeds
+        activate Database
+        Database-->>CeleryWorker: Confirm update
+        deactivate Database
+        CeleryWorker->>Redis: Cache feed_id & articles with 3h expiration
+        activate Redis
+        Redis-->>CeleryWorker: Confirm cache
+        deactivate Redis
+    end
+    deactivate CeleryWorker
+    deactivate CeleryQueue
+
+```
