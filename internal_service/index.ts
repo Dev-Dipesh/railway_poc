@@ -1,8 +1,7 @@
-console.log("Internal Service Started on - :: 3000");
-Bun.serve({
-  port: 3000, // defaults to $BUN_PORT, $PORT, $NODE_PORT otherwise 3000
-  // hostname: '::', // defaults to "0.0.0.0"
-  fetch(req) {
+const server = Bun.serve({
+  hostname: "::",
+  port: process.env.PORT ?? 3000,
+  fetch(request) {
     return new Response("Hello Bun :)");
   },
   error(error) {
@@ -10,3 +9,5 @@ Bun.serve({
     return new Response("Internal Service Error :(");
   }
 });
+
+console.log(`Listening on http://localhost:${server.port}`);
