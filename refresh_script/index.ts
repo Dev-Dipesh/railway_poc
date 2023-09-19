@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_ENDPOINT = process.env.INTERNAL_API_ENDPOINT || 'http://localhost:3000';
+const API_ENDPOINT = process.env.INTERNAL_API_ENDPOINT || 'http://internal_service';
 
 async function refreshFeedsAndQueue() {
   try {
