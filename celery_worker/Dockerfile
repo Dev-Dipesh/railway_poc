@@ -41,6 +41,8 @@ WORKDIR /app
 # Define environment variable if needed (optional)
 # ENV NAME World
 
+# Specify environment variables from Railway
+# https://docs.railway.app/deploy/dockerfiles#environment-variables
 ARG DATABASE_URL
 ARG REDIS_URL
 
