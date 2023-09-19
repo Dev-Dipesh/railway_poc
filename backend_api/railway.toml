@@ -1,0 +1,16 @@
+[build]
+builder = "nixpacks"
+nixpacksConfigPath = "nixpacks.toml"
+watchPatterns = ["src/**"]
+buildCommand = null
+
+[deploy]
+startCommand = "bun run src/index.ts"
+healthcheckPath = "/healthcheck"
+healthcheckTimeout = 100
+restartPolicyType = "NEVER"
+
+[environments.production.deploy]
+numReplicas = 2
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

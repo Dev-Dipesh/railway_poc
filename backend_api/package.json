@@ -1,0 +1,23 @@
+{
+  "scripts": {
+    "build": "bun build --target=node ./src/index.ts --outdir ./build",
+    "dev": "bun run --hot src/index.ts",
+    "start": "bun run src/index.ts",
+    "clean": "rm -rf build && echo 'Cleaning Done.'"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.3",
+    "@types/uuid": "^9.0.4",
+    "bun-types": "^1.0.1"
+  },
+  "dependencies": {
+    "celery-node": "^0.5.9",
+    "cohere-ai": "^6.2.2",
+    "hono": "^3.6.1",
+    "jose": "^4.14.6",
+    "postgres": "^3.3.5",
+    "redis": "^4.6.8",
+    "uuid": "^9.0.1"
+  }
+}
