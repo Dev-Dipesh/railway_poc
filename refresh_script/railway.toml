@@ -7,3 +7,4 @@ buildCommand = "echo buildng!"
 [deploy]
 startCommand = "bun run index.ts"
 restartPolicyType = "NEVER"
+cronSchedule = "5 * * * *"
