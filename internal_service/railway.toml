@@ -6,7 +6,5 @@ buildCommand = "bun build --target=node index.ts --outdir ./build"
 
 [deploy]
 startCommand = "bun run build/index.js"
-healthcheckPath = "internal_service.railway.internal/healthcheck"
-healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
