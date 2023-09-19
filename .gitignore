@@ -181,3 +181,6 @@ celery/
 
 # Mac DS_Store
 .DS_Store
+
+# Bun build output
+build
