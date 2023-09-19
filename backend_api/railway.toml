@@ -2,7 +2,7 @@
 builder = "nixpacks"
 nixpacksConfigPath = "nixpacks.toml"
 watchPatterns = ["src/**"]
-buildCommand = null
+buildCommand = "null"
 
 [deploy]
 startCommand = "bun run src/index.ts"
