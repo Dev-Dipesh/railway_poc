@@ -177,7 +177,7 @@ __pycache__/
 *.pyo
 *.egg-info/
 .empty/
-qenv/
+celery/
 
 # Mac DS_Store
 .DS_Store
