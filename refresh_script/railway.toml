@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-watchPatterns = ["/*.ts"]
+# watchPatterns = ["/*.ts"]
 nixpacksConfigPath = "nixpacks.toml"
 buildCommand = "echo buildng!"
 
