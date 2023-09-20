@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-# watchPatterns = ["/*.ts"]
+watchPatterns = ["**", "!/*.md"]
 nixpacksConfigPath = "nixpacks.toml"
 buildCommand = "bun build --target=node index.ts --outdir ./build"
 
