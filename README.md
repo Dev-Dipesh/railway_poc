@@ -77,10 +77,6 @@ This diagram will provide a clear picture of Railway's different features along 
 
 ## 6. Railway Development
 
-Since this is a monorepo, you will need to define the **Root Directory** in your Railway dashboard before deployment. Check out [Monorepo](https://docs.railway.app/deploy/monorepo).
-
-![Root Directory](https://docs.railway.app/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Frailway%2Fimage%2Fupload%2Fv1637798659%2Fdocs%2Froot-directory_achzga.png&w=2048&q=80)
-
 0. To see all railway cli commands:
 ```bash
 railway --help
@@ -126,6 +122,11 @@ railway unlink
 ```
 
 ## 7. Railway Build and Deployment Config
+
+Since this is a monorepo, you will need to define the **Root Directory** in your Railway dashboard before deployment. Check out [Monorepo](https://docs.railway.app/deploy/monorepo).
+
+![Root Directory](https://docs.railway.app/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Frailway%2Fimage%2Fupload%2Fv1637798659%2Fdocs%2Froot-directory_achzga.png&w=2048&q=80)
+
 We're using `nixpacks.toml` and `railway.toml` to define build configs for our projects. Let's take a look at both files from `/backend_api`.
 
 In `nixpacks.toml`, we have defined the setup and install phases. In the setup phase, we're installing nodejs and bun. In the install phase, we're installing the dependencies using bun.
