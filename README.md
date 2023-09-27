@@ -35,7 +35,7 @@ This application is RSS-based and supports the following API-based functionaliti
 | ------ | ------ | ------ |
 | backend_api | API Server built using Bun and Hono (Node.JS) | [README.md](/backend_api/README.md) |
 | celery_worker | Celery Worker written in Python | [README.md](/celery_worker/README.md) |
-| database | Contains the database schema | [README.md](/database/README.md) |
+| database | Contains the database schema | [ERD Diagram](/database/README.md) |
 | internal_service | A simple internal API server using Bun | [README.md](/internal_service/README.md) |
 | refresh_script | Cron script that calls the simple internal API server | [README.md](/refresh_script/README.md) |
 | img | Contains the images used in this README | |
