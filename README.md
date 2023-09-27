@@ -14,16 +14,17 @@
 10. [Further Challenge](#10-further-challenge)
 
 ## 1. About
-I created this POC to demonstrate leveraging various features of Railway during development, building, and deployment. There are significant room for improvement in the POC, but the focus is to demonstrate the use of Railway to boost developer productivity.
+I developed this POC to showcase the capabilities of Railway throughout its development, building, and deployment phases. While there's considerable potential for refinement in the POC, the primary intent is to highlight how Railway can enhance developer efficiency.
 
-This is an RSS application. Where following basic API based operations are supported:
-1. Healthcheck endpoint for service
-2. User can register and login
-3. User can add feeds to their profile
-4. Redis is used as both cache server and celery queue
-5. A celery task worker runs consistently to listen for new tasks in queue
-6. Postgres is used as the persistance datastore
-7. A simple cron script app that can use Railway's CRON to run on fixed schedule and query internal services via API endpoint.
+This application is RSS-based and supports the following API-based functionalities:
+
+1. A healthcheck endpoint for the service.
+2. User registration and login capabilities.
+3. Ability for users to add feeds to their profiles.
+4. Redis functions both as a cache server and a celery queue.
+5. A celery task worker operates continuously, monitoring the queue for new tasks.
+6. Postgres serves as the persistent data storage solution.
+7. There's a basic cron script app which utilizes Railway's CRON. This runs at predefined intervals, querying internal services through an API endpoint.
 
 ## 2. App Architecture
 ![App Architecture Diagram](/img/Railway%20-%20App%20Architecture.jpg)
