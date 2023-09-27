@@ -1,3 +1,46 @@
+# Railway Proof Of Concept
+## Railway, Bun, Hono, JWT, Typescript, Celery, Python, Redis, PostgresSQL
+
+## Table of Contents
+1. [About](#1-about)
+2. [App Architecture](#2-app-architecture)
+3. [Project Directories](#3-project-directories)
+4. [How to Start?](#4-how-to-start)
+5. [Railway 101](#5-railway-101)
+6. [Railway Development](#6-railway-development)
+7. [Railway Build and Deployment Config](#7-railway-build-and-deployment-config)
+8. [Railway Build and Deployment Architecture](#8-railway-build-and-deployment-architecture)
+9. [High Level Architecture](#9-high-level-architecture)
+10. [Further Challenge](#10-further-challenge)
+
+## 1. About
+I created this POC to demonstrate leveraging various features of Railway during development, building, and deployment. There are significant room for improvement in the POC, but the focus is to demonstrate the use of Railway to boost developer productivity.
+
+This is an RSS application. Where following basic API based operations are supported:
+1. Healthcheck endpoint for service
+2. User can register and login
+3. User can add feeds to their profile
+4. Redis is used as both cache server and celery queue
+5. A celery task worker runs consistently to listen for new tasks in queue
+6. Postgres is used as the persistance datastore
+7. A simple cron script app that can use Railway's CRON to run on fixed schedule and query internal services via API endpoint.
+
+## 2. App Architecture
+![App Architecture Diagram](/img/Railway%20-%20App%20Architecture.jpg)
+
+## 3. Project Directories
+
+| Directories | Purpose | Readme |
+| ------ | ------ | ------ |
+| backend_api | API Server built using Bun and Hono (Node.JS) | [README.md](/backend_api/README.md) |
+| celery_worker | Celery Worker written in Python | [README.md](/celery_worker/README.md) |
+| database | Contains the database schema | [README.md](/database/README.md) |
+| internal_service | A simple internal API server using Bun | [README.md](/internal_service/README.md) |
+| refresh_script | Cron script that calls the simple internal API server | [README.md](/refresh_script/README.md) |
+| img | Contains the images used in this README | |
+
+## 4. How to Start?
+For more commands, refer to the `package.json` of each project.
 
 `/backend_api`
 ```sh
@@ -5,19 +48,129 @@ railway run bun run --hot src/index.ts
 ```
 
 `/celery_worker`
+```sh
+railway run celery --app=tasks worker -l INFO
+```
+OR 
 > You will have to uncomment the `if __name__ == '__main__':` code in tasks.py to use this command
 
 ```sh
 railway run python tasks.py
 ```
 
-OR - _Preferably_
-
+`/internal_service`
 ```sh
-railway run celery --app=tasks worker -l INFO
+railway run bun run --hot index.ts
 ```
 
-## Sequence Diagram
+`/refresh_script`
+```sh
+railway run bun run --hot index.ts
+```
+
+## 5. Railway 101
+
+This diagram will provide a clear picture of Railway's different features along with their hierarchy.
+
+![Railway](/img/Railway.jpg)
+
+## 6. Railway Development
+
+0. To see all railway cli commands:
+```bash
+railway --help
+```
+
+1. Navigate to your project root. In this repo, if working on backend_api, navigate to `/backend_api`. Then run:
+
+```bash
+railway link
+# Select team > project > environment
+```
+
+Alternatively, you can use the project ID to link the project. Go to your Railway dashboard and click on “Setup project locally” from bottom left.
+
+> You can also change the env later if needed using
+```bash
+railway environment
+```
+
+2. Create a service and add db variable and JWT secret to it in the Railway dashboard. To link the service to your local project, run:
+
+```bash
+railway service
+```
+
+3. To get a list of all available environment variables, run:
+
+```bash
+railway variables
+```
+
+4. Deploy Postgres and Redis services and use env variables to connect to them. You will need to add the Database connecion string variable to your service. You can get the connection string from the Railway dashboard.
+
+5. To access the env variables in your local development, run:
+
+```bash
+railway run bun run --hot src/index.ts
+```
+
+6. To unlink the project from the Railway service, run:
+```bash
+railway unlink
+```
+
+## 7. Railway Build and Deployment Config
+We're using `nixpacks.toml` and `railway.toml` to define build configs for our projects. Let's take a look at both files from `/backend_api`.
+
+In `nixpacks.toml`, we have defined the setup and install phases. In the setup phase, we're installing nodejs and bun. In the install phase, we're installing the dependencies using bun.
+
+`/backend_api/nixpacks.toml`
+```toml
+[phases.setup]
+nixPkgs = ['nodejs', 'bun']
+
+[phases.install]
+cmds = ['bun install --production']
+```
+
+In `railway.toml`, we have defined the build and deploy configs. In the build config, we're using nixpacks to build the project. The watch pattern is set to trigger auto-deployment when we push new changes to the files in the specified watch path.
+
+In the deploy config, we're using bun to start the server. We've defined a base deployment config, and a production environment deployment config. You can create as many as you want based on the environments you have created on Railway.
+
+Most of the fields are self explanatory, for more details you can check out:
+- [Railway Build Doc](https://docs.railway.app/deploy/builds)
+- [Railway Config as Code](https://docs.railway.app/deploy/config-as-code)
+
+```/backend_api/railway.toml```
+```toml
+[build]
+builder = "nixpacks"
+nixpacksConfigPath = "nixpacks.toml"
+watchPatterns = ["src/**"]
+buildCommand = "echo buildng!"
+
+[deploy]
+startCommand = "bun run src/index.ts"
+healthcheckPath = "/healthcheck"
+healthcheckTimeout = 100
+restartPolicyType = "NEVER"
+
+[environments.production.deploy]
+numReplicas = 2
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+```
+
+## 8. Railway Build and Deployment Architecture
+### Railway Build Process Flow Diagram
+![Railway Build](/img/Railway%20%20-%20BUILD.jpg)
+
+### Railway Deployment Process Flow Diagram
+![Railway Deployment](/img/Railway%20%20-%20DEPLOYMENT.jpg)
+
+## 9. High Level Architecture
+### Sequence Diagram
 
 1. User sends a request to the server to add feeds with array of URLs in JSON body
 2. For Each feed(URL) the API server looks for it in Redis cache:
@@ -44,6 +197,8 @@ sequenceDiagram
     participant Database as Database
     participant CeleryQueue as Celery Queue
     participant CeleryWorker as Celery Worker
+    
+    Note over User,CeleryWorker: The user must be logged in to submit feed URLs
 
     User->>Server: Send feed URLs
     activate Server
@@ -81,6 +236,8 @@ sequenceDiagram
     Server-->>User: Confirm feed and articles processing
     deactivate Server
 
+    Note right of CeleryWorker: User can continue using the app <br/>while CeleryWorker fetches articles
+
     loop for each Task in CeleryQueue
         activate CeleryWorker
         CeleryQueue-->>CeleryWorker: Task to fetch articles
@@ -102,7 +259,8 @@ sequenceDiagram
     end
 ```
 
-### Further Challenge
+## 10. Further Challenge
+
 You can update `refresh_script` to suit following workflow:
 
 > 1. Add last_polled to `feeds` table
